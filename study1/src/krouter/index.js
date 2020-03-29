@@ -1,7 +1,8 @@
 // 实现KVueRooter类
 // 1. 路由：实现监听url
 // 2. 两个组件：router-link、router-view
-import Vue from 'vue';
+// import Vue from 'vue';
+let Vue;
 import Link from './krouter-link';
 import View from './krouter-view';
 
@@ -36,7 +37,7 @@ class KVueRouter {
 
 
 KVueRouter.install = function(_Vue) {
-    let Vue = _Vue;
+    Vue = _Vue;
 
     Vue.mixin({
         // 挂载$router

@@ -5,7 +5,7 @@
     <!-- Store 类得有 commit 方法，可以执行mutation -->
     <p @click="$store.commit('add')">{{$store.state.count}}</p>
     <p @click="$store.dispatch('asyncAdd')">async: {{$store.state.count}}</p>
-    <p>{{$store.getters.doubleCount}}</p>
+    <!-- <p>{{$store.getters.doubleCount}}</p> -->
     <h2>Essential Links</h2>
     <ul>
       <li>
@@ -95,6 +95,11 @@ export default {
     return {
       msg: 'Welcome to Your Vue.js App'
     }
+  },
+  mounted() {
+    console.log(this.$store);
+    
+    this.$store.state.count ++;
   }
 }
 </script>

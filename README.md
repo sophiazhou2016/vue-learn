@@ -12,3 +12,6 @@ vue原理深度剖析
 > 掌握render函数，三个参数：标签，属性，内容
 > 默认插槽: this.$slots.default
 > 总结： vue其实就是监听hash值的变化去渲染对应的组件到router-view
+
+## vuex
+> $store.state; commit - mutation 立即执行； dispatch - actions, getters- 派生状态； constructor里面的 get / set: 在“类”的内部可以使用get和set关键字，对某个属性设置存值函数和取值函数，拦截该属性的存取行为
