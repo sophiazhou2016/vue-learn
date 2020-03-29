@@ -22,7 +22,7 @@ class KVueRouter {
         this.$options.routes.forEach(route => {
             this.routeMap[route.path] = route;
         });
-        console.log('this.routerMap:', this.routerMap);
+        // console.log('this.routerMap:', this.routeMap);
     }
 
     onHashChange() {
