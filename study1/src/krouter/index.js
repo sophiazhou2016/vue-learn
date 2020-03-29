@@ -10,11 +10,19 @@ class KVueRouter {
         this.$options = options;
 
         // 设置一个响应式的 current 属性
+        // render函数里面用到这个，只要current变了，render就会执行
         Vue.util.defineReactive(this, 'current', '/');
 
         // 事件监听
         window.addEventListener('hashchange', this.onHashChange.bind(this));
         window.addEventListener('load', this.onHashChange.bind(this));
+
+        // 对路由数组做预处理，转化成map
+        this.routeMap = {};
+        this.$options.routes.forEach(route => {
+            this.routeMap[route.path] = route;
+        });
+        console.log('this.routerMap:', this.routerMap);
     }
 
     onHashChange() {

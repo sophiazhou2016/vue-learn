@@ -4,16 +4,11 @@ export default {
         // router.component
         let component = null;
 
-        console.log('this.$router.$options.routes:', this.$router.$options.routes);
-        this.$router.$options.routes.forEach(route => {
-            console.log(route.path, this);
-            if(route.path === this.$router.current) {
-                component = route.component;
-
-                // return h(component);
-            }
-        });
-
+        // console.log('this.$router.$options.routes:', this.$router.$options.routes);
+        const route = this.$router.routeMap[this.$router.current];
+        if(route) {
+            component = route.component;
+        }
         return h(component);
     }
 }
