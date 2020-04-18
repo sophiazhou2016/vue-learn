@@ -1,6 +1,6 @@
 # vue原理深度剖析
-## 一、kvue-router
- - 了解Vue里面的this.$options
+## 一、自己实现一个`router`组件：kvue-router
+### 1. 了解Vue里面的`this.$options`
 
 > 用于当前 Vue 实例的初始化选项
 ```javascript
@@ -24,9 +24,14 @@ const mainApp = new Vue({
 });
 ```
 
- - 了解Vue的插件 使用 Vue.use()
- -  Vue的插件是一个具有install的class类
- - Vue.mixin() 的含义
+### 2. 了解Vue的插件
+ - 安装 Vue.js 插件： `Vue.use(component);` 表示全局引用了这个插件。
+ - 如果插件是一个对象，必须提供 install 方法。
+ - 如果插件是一个函数，它会被作为 install 方法。
+ - install 方法调用时，会将 Vue 作为参数传入。
+ - 该方法需要在调用 new Vue() 之前被调用。
+ 
+### 3.Vue.mixin() 的含义
  - 如何挂载 `$router :    Vue.prototype.$router`
  - Vue如何声明一个全局组件： Vue.component()
  - 设置一个响应式的属性：Vue.util.defineReactive(this, 'current', '/');
@@ -34,6 +39,8 @@ const mainApp = new Vue({
  - 默认插槽: this.$slots.default
 
 **总结： vue-router其实就是监听hash值的变化去渲染对应的组件到router-view**
+
+
 
 
 
