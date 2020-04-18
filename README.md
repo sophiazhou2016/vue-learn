@@ -50,10 +50,102 @@ Vue.mixin({
 ### 5.设置一个响应式的属性：`Vue.util.defineReactive(this, 'current', '/');`
 ### 6.掌握render函数，三个参数：标签，属性，内容
 ### 7.默认插槽: this.$slots.default
-**总结： vue-router其实就是监听hash值的变化去渲染对应的组件到router-view**
+### 8.嵌套路由：层级深度(n)，当前的数组[n]
+**总结： vue-router其实就是监听hash值的变化去渲染对应的组件到router-view** ，具体的参见代码 krouter
 
+##  二、自己实现vuex
+### 1、Vuex的基本概念 
+#### *state:*
+> `this.$store.state`。通过全局注册到根实例该 store 实例会注入到根组件下的所有子组件中，且子组件能通过
+> `this.$store` 访问到。
 
+```javascript
+const app = new Vue({
+  el: '#app',
+  // 把 store 对象提供给 “store” 选项，这可以把 store 的实例注入所有的子组件。
+  store,
+  components: { Counter },
+  template: `
+    <div class="app">
+      <counter></counter>
+    </div>
+  `
+})
+```
+#### *getter*
+> 可以认为是 `store` 的计算属性.Getter 接受 state 作为其第一个参数：
 
+```javascript
+const store = new Vuex.Store({
+  state: {
+    todos: [
+      { id: 1, text: '...', done: true },
+      { id: 2, text: '...', done: false }
+    ]
+  },
+  getters: {
+    doneTodos: state => {
+      return state.todos.filter(todo => todo.done)
+    }
+  }
+})
+```
 
-## vuex
-> $store.state; commit - mutation 立即执行； dispatch - actions, getters- 派生状态； constructor里面的 get / set: 在“类”的内部可以使用get和set关键字，对某个属性设置存值函数和取值函数，拦截该属性的存取行为
+> 我们可以很容易地在任何组件中使用它：
+
+```javascript
+this.$store.getters.doneTodosCount
+```
+#### *mutation*
+> 更改 Vuex 的 store 中的状态的唯一方法是提交 mutation
+```javascript
+mutations: {
+        add(state) {
+            // state怎么来的
+            state.count ++;
+        }
+},
+```
+可以这样调用 mutations 里面的方法：
+
+```javascript
+this.$store.commit('add')
+```
+#### *action*
+> 类似muatation，Action 提交的是 mutation，而不是直接变更状态。Action 函数接受一个与 store 实例具有相同方法和属性的 context 对象，因此你可以调用 context.commit 提交一个 mutation，或者通过 context.state 和 context.getters 来获取 state 和 getters。
+
+```javascript
+actions: {
+    increment (context) {
+      context.commit('increment')
+    }
+  }
+```
+
+> 实践中，我们会经常用到 ES2015 的 参数解构 来简化代码（特别是我们需要调用 commit 很多次的时候）：
+```javascript
+actions: {
+  increment ({ commit }) {
+    commit('increment')
+  }
+}
+```
+> Action 通过 store.dispatch 方法触发：
+
+```javascript
+store.dispatch('increment')
+```
+> 与mutations 的差别：mutations 必须是同步的，actions 可以是异步或者同步：
+
+```javascript
+actions: {
+  incrementAsync ({ commit }) {
+    setTimeout(() => {
+      commit('increment')
+    }, 1000)
+  }
+}
+```
+#### *modules*
+
+$store.state; commit - mutation 立即执行； dispatch - actions, getters- 派生状态； constructor里面的 get / set: 在“类”的内部可以使用get和set关键字，对某个属性设置存值函数和取值函数，拦截该属性的存取行为
