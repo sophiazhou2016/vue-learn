@@ -1,6 +1,7 @@
 <template>
     <div>
         about
+        <router-view></router-view>
     </div>
 </template>
 

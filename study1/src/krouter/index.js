@@ -12,17 +12,21 @@ class KVueRouter {
 
         // 设置一个响应式的 current 属性
         // render函数里面用到这个，只要current变了，render就会执行
-        Vue.util.defineReactive(this, 'current', '/');
+        // Vue.util.defineReactive(this, 'current', '/');
+        this.current = window.location.hash.slice(1) || '/';
+        Vue.util.defineReactive(this, 'matched', []);
+        // match方法可以递归遍历路由表
+        // this.match();
 
         // 事件监听
         window.addEventListener('hashchange', this.onHashChange.bind(this));
         window.addEventListener('load', this.onHashChange.bind(this));
 
         // 对路由数组做预处理，转化成map
-        this.routeMap = {};
-        this.$options.routes.forEach(route => {
-            this.routeMap[route.path] = route;
-        });
+        // this.routeMap = {};
+        // this.$options.routes.forEach(route => {
+        //     this.routeMap[route.path] = route;
+        // });
         // console.log('this.routerMap:', this.routeMap);
     }
 
@@ -31,6 +35,30 @@ class KVueRouter {
         this.current = window.location.hash.slice(1)
         console.log('onHashChange:', this.current);
         // 界面动态响应Url变化（响应式）
+        this.matched = [];
+        this.match();
+    }
+
+    match(routes) {
+        routes = routes || this.$options.routes;
+
+        // 递归遍历
+        for(const route of routes) {
+            if(route.path === '/' && this.current === '/') {
+                this.matched.push(route);
+                return;
+            }
+            // about/info
+            if(route.path !== '/' && this.current.indexOf(route.path) !== -1) {
+                this.matched.push(route);
+                console.log('matched: ', this.matched);
+                if(route.children) {
+                    console.log('matched children',route.children);
+                    this.match(route.children);
+                }
+                return;
+            }
+        }
     }
 }
 

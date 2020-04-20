@@ -15,7 +15,17 @@ export default new Router({
     {
       path: '/about',
       name: 'about',
-      component: about
+      component: about,
+      children: [
+        {
+          path: '/about/info',
+          component: {
+            render(h) {
+              return h('div', 'info page');
+            } 
+          }
+        }
+      ]
     }
   ]
 })
