@@ -5,20 +5,40 @@ let Vue;
 class Store {
     constructor(options = {}) {
         // this.$options = options;
+        
+
+        // 保存mutatios
+        this._mutations = options.mutations;
+        this._actions = options.actions;
+
+        this._wrappedGetters = options.getters;
+        
+        // 定义computed选项
+        const computed = {};
+        this.getters = {};
+        // (doubleCounter(state) {})
+        const store = this;
+        Object.keys(this._wrappedGetters).forEach(key => {
+            // 获取用户定义的getter
+            const fn = store._wrappedGetters[key];
+            // 转换为 computed 可以使用的无参数形式
+            computed[key] = function() {
+                return fn(store.state);
+            };
+            // 为getters 定义只读属性
+            Object.defineProperty(store.getters, key, {
+                get: () => store._vm[key]
+            })
+        });
         // 只要放到data上，即成为响应式的
         this._vm = new Vue({
             data: {
                 $$state: options.state
-            }
+            },
+            computed
         });
-
-        // 保存mutatios
-        this._mutations = options.mutations;
-
-        this._actions = options.actions;
-
         // 绑定commit、dispatch方法中的this到Store实例上
-        const store = this;
+        // const store = this;
         const {commit, dispatch} = store;
         // this.commit = function boundCommit(type, payload) {
         this.commit = function boundCommit(type, payload) {
