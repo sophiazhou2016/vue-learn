@@ -6,6 +6,63 @@
     <title>Document</title>
 </head>
 <body>
-    <script src="./01-defineReactive.js"></script>
+    <div id="app">
+        <p>{{counter}}</p>
+    </div>
+    <script>
+        // 对象响应化：遍历每个key, 定义getter、setter
+        function observe(obj) {
+            if(typeof obj !== 'object' || obj === null) {
+                return;
+            }
+            Object.keys(obj).forEach(key => {
+                defineReactive(obj, key, obj[key]);
+            });
+        }
+
+        function defineReactive(obj, key, val) {
+            Object.defineProperty(obj, key, {
+                get() {
+                    console.log('get:', key, val);
+                    return val;
+                },
+                set(newVal) {
+                    if(val !== newVal) {
+                        console.log('set:', newVal);
+                        val = newVal;
+                    }
+                    // 更新
+                    update();
+                }
+            });
+        }
+
+        // 更新
+        function update() {
+            app.innerText = obj.foo;
+        }
+
+        let obj = {
+            foo: 'foo',
+            bar: 'bar',
+            baz: {
+                a: 1
+            }
+        };
+        observe(obj);
+        defineReactive(obj, 'foo', '');
+
+        obj.foo;
+        // obj.foo = new Date().toLocaleTimeString();
+        obj.foo = 'fooooooo';
+        obj.bar;
+        obj.bar = 'barrrrrr';
+        obj.baz.a = 10;
+
+
+        // setInterval(() => {
+        //     obj.foo = new Date().toLocaleTimeString();
+        // }, 1000);
+    </script>
 </body>
 </html>
