@@ -8,8 +8,22 @@
 <body>
     <div id="app">
         <p>{{counter}}</p>
+        <p>{{counter}}</p>
     </div>
+    <script src="kvue.js"></script>
     <script>
+        const app = new KVue({
+            el: '#app',
+            data: {
+                counter: 1
+            }
+        });
+        setInterval(() => {
+            app.counter ++; // 未做代理，无法访问
+            // app.$data.counter ++;
+        }, 1000);
+    </script>
+    <!-- <script>
         // 对象响应化：遍历每个key, 定义getter、setter
         function observe(obj) {
             if(typeof obj !== 'object' || obj === null) {
@@ -63,6 +77,6 @@
         // setInterval(() => {
         //     obj.foo = new Date().toLocaleTimeString();
         // }, 1000);
-    </script>
+    </script> -->
 </body>
 </html>
