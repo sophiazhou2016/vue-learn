@@ -12,10 +12,15 @@ function defineReactive(obj, key, val) {
     // 这里的val由形参变成了内部变量，一直存在缓存里面
     // console.log('初始化', val);
     observe(val); // 内部嵌套
+
+    // 创建Dep实例和key 一一对应
+    const dep = new Dep();
     // 递归遍历，如果val本身是个对象
     Object.defineProperty(obj, key, {
         get() {
-            console.log('get:', key, val);
+            // console.log('get:', key, val);
+            // 依赖收集
+            Dep.target && dep.addDep(Dep.target);
             return val;
         },
         set(newVal) {
@@ -26,9 +31,10 @@ function defineReactive(obj, key, val) {
                 val = newVal;
 
                 // 更新
-                watchers.forEach(w => {
-                    w.update();
-                });
+                // watchers.forEach(w => {
+                //     w.update();
+                // });
+                dep.notify();
             }
             // 更新
             // update();
@@ -75,7 +81,23 @@ class Observer {
         });
     }
 }
-const watchers = [];
+// const watchers = [];
+
+// Dep : 管理watcher
+class Dep {
+    constructor() {
+        this.watchers = [];
+    }
+    addDep(watcher) {
+        this.watchers.push(watcher);
+    }
+    notify() {
+        this.watchers.forEach(watcher => {
+            watcher.update();
+        });
+    }
+}
+
 // Watcher: 和模板中的依赖1对1对应，如果某个key发生变化，则执行更新函数
 class Watcher {
     constructor(vm, key, updateFn) {
@@ -83,7 +105,11 @@ class Watcher {
         this.key = key;
         this.updateFn = updateFn;
         
-        watchers.push(this);
+        // watchers.push(this);
+        // 和Dep建立关系
+        Dep.target = this;
+        this.vm[this.key] // 触发get,可以做依赖收集
+        Dep.target = null;
     }
     // 更新方法是让Dep调用的
     update() {
@@ -191,3 +217,4 @@ class Compile {
     
     // k-model 指令执行
 }
+
