@@ -9,13 +9,15 @@
     <div id="app">
         <p>{{counter}}</p>
         <p k-text="counter"></p>
+        <p k-html="desc"></p>
     </div>
     <script src="kvue.js"></script>
     <script>
         const app = new KVue({
             el: '#app',
             data: {
-                counter: 1
+                counter: 1,
+                desc: '<span style="color:red;">kvue 可还行</span>'
             }
         });
         setInterval(() => {

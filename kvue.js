@@ -24,6 +24,11 @@ function defineReactive(obj, key, val) {
                 observe(newVal);
                 console.log('set:', newVal);
                 val = newVal;
+
+                // 更新
+                watchers.forEach(w => {
+                    w.update();
+                });
             }
             // 更新
             // update();
@@ -56,7 +61,6 @@ class KVue {
         // 2.编译
         new Compile(this.$options.el, this);
     }
-
 }
 
 // 执行数据响应式，分辨响应式的数据是对象还是数据
@@ -69,6 +73,21 @@ class Observer {
         Object.keys(obj).forEach(key => {
             defineReactive(obj, key, obj[key]);
         });
+    }
+}
+const watchers = [];
+// Watcher: 和模板中的依赖1对1对应，如果某个key发生变化，则执行更新函数
+class Watcher {
+    constructor(vm, key, updateFn) {
+        this.vm = vm;
+        this.key = key;
+        this.updateFn = updateFn;
+        
+        watchers.push(this);
+    }
+    // 更新方法是让Dep调用的
+    update() {
+        this.updateFn.call(this.vm, this.vm[this.key]);
     }
 }
 
@@ -109,9 +128,30 @@ class Compile {
         return node.nodeType === 3 && /\{\{(.*)\}\}/.test(node.textContent);
     }
 
+    // 更新方法
+    update(node, exp, dir) {
+        // 找到实操函数
+        const fn = this[dir + 'Updater'];
+        // 初始化
+        fn && fn(node, this.$vm[exp]);
+        // 更新
+        new Watcher(this.$vm, exp, function(val) {
+            // console.log('update:', val);
+            // 这里的val 就是 this.$vm[exp]
+            fn && fn(node, val);
+        });
+    }
+
+    textUpdater(node, val) {
+        // 具体操作
+        node.textContent = val;
+        // this.update(node, );
+    }
+
     // 编译插值文本，初始化
     compileText(node) {
-        node.textContent = this.$vm[RegExp.$1];
+        // node.textContent = this.$vm[RegExp.$1];
+        this.update(node, RegExp.$1, 'text');
     }
 
     // 编译元素节点,判断属性是否是 k-xx  @xx
@@ -138,4 +178,16 @@ class Compile {
     text(node, exp) {
         node.textContent = this.$vm[exp];
     }
+
+    // k-html 指令执行
+    html(node, exp) {
+        // node.innerHTML = this.$vm[exp];
+        this.update(node, exp, 'html');
+    }
+
+    htmlUpdater(node, val) {
+        node.innerHTML = val;
+    }
+    
+    // k-model 指令执行
 }
