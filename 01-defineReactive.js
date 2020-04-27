@@ -1,4 +1,18 @@
- // 对象响应化：遍历每个key, 定义getter、setter
+// 数组响应式
+// 1. 替换数组原型中的7个方法
+const originalProto = Array.prototype;
+// 备份一份，修改备份
+const arrayProto = Object.create(originalProto);
+['push', 'pop', 'shift', 'unshift'].forEach(method => {
+    arrayProto[method] = function() {
+        // 原始操作
+        originalProto[method].apply(this, arguments);
+        // 覆盖操作：通知更新
+        console.log('数组执行 ' + method + ': 操作');
+    };
+});
+
+// 对象响应化：遍历每个key, 定义getter、setter
  function observe(obj) {
     if(typeof obj !== 'object' || obj === null) {
         return;

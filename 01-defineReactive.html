@@ -8,6 +8,7 @@
 <body>
     <div id="app">
         <p>{{counter}}</p>
+        <p>{{arr}}</p>
         <p k-text="counter"></p>
         <p k-html="desc"></p>
     </div>
@@ -17,13 +18,19 @@
             el: '#app',
             data: {
                 counter: 1,
-                desc: '<span style="color:red;">kvue 可还行</span>'
+                desc: '<span style="color:red;">kvue 可还行</span>',
+                arr: [12, 13]
             }
         });
         setInterval(() => {
             app.counter ++; // 未做代理，无法访问
-            // app.$data.counter ++;
         }, 1000);
+
+        setTimeout(() => {
+            app.arr.push(14);
+            // app.set(app.arr, 2, 14);
+            console.log(app.arr);
+        }, 2000);
     </script>
     <!-- <script>
         // 对象响应化：遍历每个key, 定义getter、setter

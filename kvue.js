@@ -1,20 +1,55 @@
+// Dep : 管理watcher
+class Dep {
+    constructor() {
+        this.watchers = [];
+    }
+    addDep(watcher) {
+        this.watchers.push(watcher);
+    }
+    notify() {
+        this.watchers.forEach(watcher => {
+            watcher.update();
+        });
+    }
+}
+const dep = new Dep();
+
+// 数组响应式
+// 1. 替换数组原型中的7个方法
+const originalProto = Array.prototype;
+// 备份一份，修改备份
+const arrayProto = Object.create(originalProto);
+['push', 'pop', 'shift', 'unshift'].forEach(method => {
+    arrayProto[method] = function() {
+        // 原始操作
+        originalProto[method].apply(this, arguments);
+        // 覆盖操作：通知更新
+        console.log('数组执行 ' + method + ': 操作');
+        observe(this);
+        dep.notify();
+    };
+});
+
 function observe(obj) {
     if(typeof obj !== 'object' || obj === null) {
         return;
     }
+    
     // 创建一个Observer实例
     // 每次遍历一个对象属性就创建一个Ob实例
     new Observer(obj);
 }
 
-// 定义响应式
+
+
+// 对象响应式
 function defineReactive(obj, key, val) {
     // 这里的val由形参变成了内部变量，一直存在缓存里面
     // console.log('初始化', val);
     observe(val); // 内部嵌套
 
     // 创建Dep实例和key 一一对应
-    const dep = new Dep();
+    // const dep = new Dep();
     // 递归遍历，如果val本身是个对象
     Object.defineProperty(obj, key, {
         get() {
@@ -24,6 +59,7 @@ function defineReactive(obj, key, val) {
             return val;
         },
         set(newVal) {
+            // debugger
             if(val !== newVal) {
                 // 如果val本身是对象，还是需要做响应式处理
                 observe(newVal);
@@ -56,6 +92,8 @@ function proxy(vm, prop) {
     });
 }
 
+
+
 class KVue {
     constructor(options) {
         this.$options = options;
@@ -67,6 +105,10 @@ class KVue {
         // 2.编译
         new Compile(this.$options.el, this);
     }
+
+    set(obj, key, val) {
+        defineReactive(obj, key, val);
+    }
 }
 
 // 执行数据响应式，分辨响应式的数据是对象还是数据
@@ -76,27 +118,38 @@ class Observer {
         this.walk(value);
     }
     walk(obj) {
-        Object.keys(obj).forEach(key => {
-            defineReactive(obj, key, obj[key]);
-        });
+        // 判断obj类型
+        if (Array.isArray(obj)) {
+            // 覆盖原型，替换7个方法
+            obj.__proto__ = arrayProto;
+            // 对数组内部的元素执行响应化
+            const keys = Object.keys(obj);
+            for(let i = 0; i < keys.length; i++){
+                defineReactive(obj, i, obj[i]);
+            }
+        } else {
+            Object.keys(obj).forEach(key => {
+                defineReactive(obj, key, obj[key]);
+            });
+        }
     }
 }
 // const watchers = [];
 
-// Dep : 管理watcher
-class Dep {
-    constructor() {
-        this.watchers = [];
-    }
-    addDep(watcher) {
-        this.watchers.push(watcher);
-    }
-    notify() {
-        this.watchers.forEach(watcher => {
-            watcher.update();
-        });
-    }
-}
+// // Dep : 管理watcher
+// class Dep {
+//     constructor() {
+//         this.watchers = [];
+//     }
+//     addDep(watcher) {
+//         this.watchers.push(watcher);
+//     }
+//     notify() {
+//         this.watchers.forEach(watcher => {
+//             watcher.update();
+//         });
+//     }
+// }
 
 // Watcher: 和模板中的依赖1对1对应，如果某个key发生变化，则执行更新函数
 class Watcher {
