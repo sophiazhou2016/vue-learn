@@ -202,7 +202,8 @@ class Compile {
 
     // k-text 执行执行
     text(node, exp) {
-        node.textContent = this.$vm[exp];
+        // node.textContent = this.$vm[exp];
+        this.update(node, exp, 'text');
     }
 
     // k-html 指令执行
